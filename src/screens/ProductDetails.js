@@ -52,24 +52,34 @@ const ProductDetails = ({route}) => {
               style={{
                 height: 35,
                 width: 35,
-                backgroundColor: 'red',
+                backgroundColor: 'white',
                 borderRadius: 50,
                 justifyContent: 'center',
                 alignItems: 'center',
+                marginRight: 10,
               }}>
               <Image
                 source={require('../assets/icons/heart.png')}
                 style={{
                   width: 20,
                   height: 20,
-                  // marginRight: 15,
                 }}
               />
             </View>
-            <Image
-              source={require('../assets/icons/cart.png')}
-              style={{width: 20, height: 20}}
-            />
+            <View
+              style={{
+                height: 35,
+                width: 35,
+                backgroundColor: 'white',
+                borderRadius: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                source={require('../assets/icons/cart.png')}
+                style={{width: 20, height: 20}}
+              />
+            </View>
           </View>
         </View>
 

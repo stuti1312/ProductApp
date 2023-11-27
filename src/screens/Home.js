@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
@@ -14,6 +15,9 @@ const Home = ({navigation}) => {
   const [products, setProducts] = useState([]);
   const [totalItemCount, setTotalItemCount] = useState(0);
   const [isGridView, setIsGridView] = useState(true);
+  const [onSearch, setOnSearch] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,31 +40,23 @@ const Home = ({navigation}) => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    // Filter the data based on the search input
+    const filtered = products.filter(item =>
+      item.title.toLowerCase().includes(search.toLowerCase()),
+    );
+    setFilteredData(filtered);
+  }, [search]);
+
   const renderItem = ({item}) => {
     const modifiedTodayDate = moment(new Date()).format('DD/MM/YYYY');
     const modifiedDates = moment(item.date).format('DD/MM/YYYY');
-
-    // console.log("date>>>>>>>>>>>>>>>>",modifiedTodayDate);
-    // console.log('date>>>>>>>>>>>>>>>>', modifiedDates);
-    // console.log("yesterday date boolean",modifiedDates == modifiedTodayDate-1);
-
-    const dateHeader = () => {
-      if (modifiedDates == modifiedTodayDate) {
-        return (dateStatus = 'Today');
-      } else if (modifiedDates == modifiedTodayDate - 1) {
-        return (dateStatus = 'Yesterday');
-      } else {
-        return (dateStatus = modifiedDates);
-      }
-      return dateStatus;
-    };
-
     const StarRating = ({rating}) => {
       const renderStars = () => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
           stars.push(
-            <View>
+            <View key={i}>
               {i <= rating ? (
                 <Image
                   source={require('../assets/icons/starFull.png')}
@@ -95,32 +91,6 @@ const Home = ({navigation}) => {
         </View>
       );
     };
-
-    const ratings = () => {
-      if (item.rating.rate < 1) {
-        return (src = '1 half star 4 empty star');
-      } else if (item.rating.rate <= 1) {
-        return (src = '1 full star 4 empty star');
-      } else if (item.rating.rate < 2) {
-        return (src = '1 full star 1 half star 3 empty star');
-      } else if (item.rating.rate == 2) {
-        return (src = '2 full star 3 empty star');
-      } else if (item.rating.rate < 3) {
-        return (src = '2 full star 1 half star 2 empty star');
-      } else if (item.rating.rate == 3) {
-        return (src = '3 full star 2 empty star');
-      } else if (item.rating.rate < 4) {
-        return (src = '3 full star 1 half star 1 empty star');
-      } else if (item.rating.rate == 4) {
-        return (src = '4 full star 1 empty star');
-      } else if (item.rating.rate < 5) {
-        return (src = '4 full star 1 half star');
-      } else if (item.rating.rate == 5) {
-        return (src = '5 full star');
-      }
-      return src;
-    };
-
     return (
       <TouchableOpacity
         style={{
@@ -135,7 +105,6 @@ const Home = ({navigation}) => {
             navigation: navigation,
           })
         }>
-        <Text>{item.date}</Text>
         <Image
           source={{uri: item.image}}
           style={{
@@ -201,7 +170,21 @@ const Home = ({navigation}) => {
               marginRight: 15,
             }}
           />
-          <Text style={{fontSize: 17}}>Women</Text>
+          {onSearch ? (
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: 'lightgray',
+                padding: 5,
+                width: '89%',
+              }}
+              placeholder="Search..."
+              onChangeText={text => setSearch(text)}
+              value={search}
+            />
+          ) : (
+            <Text style={{fontSize: 17}}>Women</Text>
+          )}
         </View>
         <View
           style={{
@@ -210,7 +193,7 @@ const Home = ({navigation}) => {
             alignItems: 'center',
             justifyContent: 'flex-end',
           }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setOnSearch(true)}>
             <Image
               source={require('../assets/icons/search.png')}
               style={{
@@ -283,7 +266,7 @@ const Home = ({navigation}) => {
       {/* ITEM LIST */}
       <View style={{marginHorizontal: 10}}>
         <FlatList
-          data={products}
+          data={onSearch ? filteredData : products}
           renderItem={renderItem}
           key={isGridView ? 'grid' : 'list'}
           numColumns={isGridView ? 2 : 1}
